@@ -1,0 +1,22 @@
+server:
+  port: 8082
+  address: 0.0.0.0
+
+spring:
+  application:
+    name: msgr-user
+  datasource:
+    url: jdbc:postgresql://localhost:5432/messenger_db
+    username: messenger
+    password: messenger_pass
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+jwt:
+  secret: your-super-secret-key-change-in-production-min-256-bits-long!!!
+
+logging:
+  level:
+    ru.vsu.cs: DEBUG

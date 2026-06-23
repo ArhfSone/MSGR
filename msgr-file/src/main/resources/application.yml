@@ -1,0 +1,38 @@
+server:
+  port: 8084
+  address: 0.0.0.0
+
+spring:
+  application:
+    name: msgr-file
+  datasource:
+    url: jdbc:postgresql://localhost:5432/messenger_db
+    username: messenger
+    password: messenger_pass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # Настройки для загрузки больших файлов (до 512 МБ)
+  servlet:
+    multipart:
+      max-file-size: 512MB
+      max-request-size: 512MB
+
+jwt:
+  secret: your-super-secret-key-change-in-production-min-256-bits-long!!!
+
+# Настройки файлового хранилища
+file:
+  upload-dir: ./uploads
+  allowed-types: image/jpeg,image/png
+  max-size: 536870912   # 512 МБ в байтах
+
+logging:
+  level:
+    ru.vsu.cs: DEBUG

@@ -1,0 +1,45 @@
+name: messenger_app
+description: "Кроссплатформенный мессенджер"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # HTTP-клиент
+  dio: ^5.4.3
+
+  # Хранение токенов
+  flutter_secure_storage: ^9.0.0
+
+  # Роутинг
+  go_router: ^14.2.0
+
+  # Валидация форм
+  form_validator: ^2.1.1
+
+  # Утилиты
+  intl: ^0.19.0
+
+  # Работа с файлами
+  file_picker: ^8.0.0
+  open_filex: ^4.5.0
+  path_provider: ^2.1.3
+  cached_network_image: ^3.3.1
+  http: ^1.2.1
+  url_launcher: ^6.2.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
