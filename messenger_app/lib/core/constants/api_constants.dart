@@ -1,14 +1,11 @@
 class ApiConstants {
   // Базовые URL микросервисов
-  // Базовые URL микросервисов
-  // Измени на IP твоего компьютера!
-  static const String serverIp = '77.238.155.115';  // ← ЗАМЕНИ НА СВОЙ IP
-  
-  static const String gatewayUrl = 'http://$serverIp:8080';
-  static const String authUrl = 'http://$serverIp:8081';
-  static const String userUrl = 'http://$serverIp:8082';
-  static const String chatUrl = 'http://$serverIp:8083';
-  static const String fileUrl = 'http://$serverIp:8084';
+  static const String gatewayUrl = 'http://localhost:8080';
+  static const String authUrl = 'http://localhost:8081';
+  static const String userUrl = 'http://localhost:8082';
+  static const String chatUrl = 'http://localhost:8083';
+  static const String fileUrl = 'http://localhost:8084';
+
   // Auth endpoints
   static const String register = '$authUrl/api/auth/register';
   static const String login = '$authUrl/api/auth/login';
