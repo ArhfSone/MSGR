@@ -1,10 +1,10 @@
 class ApiConstants {
   // Базовые URL микросервисов
-  static const String gatewayUrl = 'http://localhost:8080';
-  static const String authUrl = 'http://localhost:8081';
-  static const String userUrl = 'http://localhost:8082';
-  static const String chatUrl = 'http://localhost:8083';
-  static const String fileUrl = 'http://localhost:8084';
+  static const String gatewayUrl = 'http://127.0.0.1:8080';
+  static const String authUrl = 'http://127.0.0.1:8081';
+  static const String userUrl = 'http://127.0.0.1:8082';
+  static const String chatUrl = 'http://127.0.0.1:8083';
+  static const String fileUrl = 'http://127.0.0.1:8084';
 
   // Auth endpoints
   static const String register = '$authUrl/api/auth/register';
