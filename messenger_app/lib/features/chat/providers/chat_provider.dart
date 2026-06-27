@@ -67,6 +67,28 @@ class MessageNotifier extends StateNotifier<AsyncValue<void>> {
       state = AsyncValue.error(e, st);
     }
   }
+
+  /// Редактирование текстового сообщения
+  Future<void> editMessage(int messageId, String content) async {
+    state = const AsyncValue.loading();
+    try {
+      await _repository.editMessage(chatId, messageId, content);
+      state = const AsyncValue.data(null);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  /// Удаление сообщения
+  Future<void> deleteMessage(int messageId) async {
+    state = const AsyncValue.loading();
+    try {
+      await _repository.deleteMessage(chatId, messageId);
+      state = const AsyncValue.data(null);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
 }
 
 final messageNotifierProvider =

@@ -53,27 +53,37 @@ class ChatRepository {
   }
 
   Future<MessageResponse> sendMessage(int chatId, MessageRequest request) async {
-  try {
-    print('📤 Отправка сообщения в чат $chatId');
-    print('📤 URL: ${ApiConstants.chats}/$chatId/messages');
-    print('📤 Данные: ${request.toJson()}');
-
-    final response = await dio.post(
-      '${ApiConstants.chats}/$chatId/messages',
-      data: request.toJson(),
-    );
-
-    print('✅ Сообщение отправлено: ${response.statusCode}');
-    print('✅ Ответ: ${response.data}');
-
-    return MessageResponse.fromJson(response.data as Map<String, dynamic>);
-  } on DioException catch (e) {
-    print('❌ Ошибка отправки: ${e.message}');
-    print('❌ Статус: ${e.response?.statusCode}');
-    print('❌ Ответ: ${e.response?.data}');
-    throw _handleError(e);
+    try {
+      final response = await dio.post(
+        '${ApiConstants.chats}/$chatId/messages',
+        data: request.toJson(),
+      );
+      return MessageResponse.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
   }
-}
+
+  Future<MessageResponse> editMessage(
+      int chatId, int messageId, String content) async {
+    try {
+      final response = await dio.put(
+        '${ApiConstants.chats}/$chatId/messages/$messageId',
+        data: {'content': content},
+      );
+      return MessageResponse.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<void> deleteMessage(int chatId, int messageId) async {
+    try {
+      await dio.delete('${ApiConstants.chats}/$chatId/messages/$messageId');
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
 
   Future<ChatResponse> createPrivateChat(String targetUsername) async {
     try {

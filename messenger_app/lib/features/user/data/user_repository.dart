@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../core/network/dio_client.dart';
+import 'dto/update_profile_request.dart';
 import 'dto/user_model.dart';
 
 final userRepositoryProvider = Provider<UserRepository>((ref) {
@@ -32,6 +33,30 @@ class UserRepository {
     try {
       final response = await dio.get(ApiConstants.me);
       return UserModel.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<UserModel> updateProfile(UpdateProfileRequest request) async {
+    try {
+      final response = await dio.put(
+        ApiConstants.me,
+        data: request.toJson(),
+      );
+      return UserModel.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  Future<UserModel?> getUserByUsername(String username) async {
+    try {
+      final users = await searchUsers(username);
+      for (final user in users) {
+        if (user.username == username) return user;
+      }
+      return null;
     } on DioException catch (e) {
       throw _handleError(e);
     }

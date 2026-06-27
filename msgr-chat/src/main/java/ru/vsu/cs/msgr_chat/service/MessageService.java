@@ -129,6 +129,66 @@ public class MessageService {
     }
 
     /**
+     * Редактирование текстового сообщения (только автор)
+     */
+    @Transactional
+    public MessageResponse editMessage(Long chatId, Long messageId, Long userId,
+                                       String newContent) {
+        if (newContent == null || newContent.trim().isEmpty()) {
+            throw new RuntimeException("Текст сообщения не может быть пустым");
+        }
+
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new RuntimeException("Сообщение не найдено"));
+
+        if (!message.getChat().getId().equals(chatId)) {
+            throw new RuntimeException("Сообщение не принадлежит этому чату");
+        }
+
+        if (!message.getSender().getId().equals(userId)) {
+            throw new RuntimeException("Вы можете редактировать только свои сообщения");
+        }
+
+        if (message.getType() != MessageType.TEXT) {
+            throw new RuntimeException("Можно редактировать только текстовые сообщения");
+        }
+
+        Chat chat = message.getChat();
+        if (!chatMemberRepository.existsByChatAndUser(chat, User.builder().id(userId).build())) {
+            throw new RuntimeException("Вы не являетесь участником этого чата");
+        }
+
+        message.setContent(newContent.trim());
+        message.setIsEdited(true);
+        messageRepository.save(message);
+        return mapToMessageResponse(message);
+    }
+
+    /**
+     * Удаление сообщения (только автор)
+     */
+    @Transactional
+    public void deleteMessage(Long chatId, Long messageId, Long userId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new RuntimeException("Сообщение не найдено"));
+
+        if (!message.getChat().getId().equals(chatId)) {
+            throw new RuntimeException("Сообщение не принадлежит этому чату");
+        }
+
+        if (!message.getSender().getId().equals(userId)) {
+            throw new RuntimeException("Вы можете удалять только свои сообщения");
+        }
+
+        Chat chat = message.getChat();
+        if (!chatMemberRepository.existsByChatAndUser(chat, User.builder().id(userId).build())) {
+            throw new RuntimeException("Вы не являетесь участником этого чата");
+        }
+
+        messageRepository.delete(message);
+    }
+
+    /**
      * Маппинг Entity Message в DTO MessageResponse
      */
     private MessageResponse mapToMessageResponse(Message message) {

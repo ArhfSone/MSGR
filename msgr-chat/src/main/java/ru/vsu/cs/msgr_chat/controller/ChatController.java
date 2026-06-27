@@ -164,4 +164,32 @@ public class ChatController {
         List<MessageResponse> messages = messageService.getChatMessages(chatId, userId, page, size);
         return ResponseEntity.ok(messages);
     }
+
+    /**
+     * Редактировать текстовое сообщение
+     */
+    @PutMapping("/{chatId}/messages/{messageId}")
+    public ResponseEntity<MessageResponse> editMessage(
+            Authentication authentication,
+            @PathVariable Long chatId,
+            @PathVariable Long messageId,
+            @Valid @RequestBody EditMessageRequest request) {
+        Long userId = (Long) authentication.getPrincipal();
+        MessageResponse response = messageService.editMessage(
+                chatId, messageId, userId, request.getContent());
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Удалить сообщение
+     */
+    @DeleteMapping("/{chatId}/messages/{messageId}")
+    public ResponseEntity<Void> deleteMessage(
+            Authentication authentication,
+            @PathVariable Long chatId,
+            @PathVariable Long messageId) {
+        Long userId = (Long) authentication.getPrincipal();
+        messageService.deleteMessage(chatId, messageId, userId);
+        return ResponseEntity.noContent().build();
+    }
 }
