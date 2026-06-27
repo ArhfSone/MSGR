@@ -63,4 +63,13 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>start</id>
+			<build>
+				<defaultGoal>test spring-boot:run</defaultGoal>
+			</build>
+		</profile>
+	</profiles>
+
 </project>
