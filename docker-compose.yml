@@ -1,7 +1,22 @@
-version: '3.9'
+x-msgr-db-env: &msgr-db-env
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/messenger_db
+  SPRING_DATASOURCE_USERNAME: messenger
+  SPRING_DATASOURCE_PASSWORD: messenger_pass
+  JWT_SECRET: your-super-secret-key-change-in-production-min-256-bits-long!!!
+
+x-msgr-service: &msgr-service
+  image: msgr-backend:latest
+  build:
+    context: .
+    dockerfile: Dockerfile
+  depends_on:
+    postgres:
+      condition: service_healthy
+  networks:
+    - msgr-network
+  restart: unless-stopped
 
 services:
-  # === PostgreSQL ===
   postgres:
     image: postgres:16-alpine
     container_name: msgr-postgres
@@ -22,7 +37,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # === Redis (для кэша JWT и сессий) ===
   redis:
     image: redis:7-alpine
     container_name: msgr-redis
@@ -38,9 +52,87 @@ services:
       timeout: 5s
       retries: 5
 
+  msgr-auth:
+    <<: *msgr-service
+    container_name: msgr-auth
+    environment:
+      <<: *msgr-db-env
+      MSGR_SERVICE: auth
+      SERVER_PORT: 8081
+    ports:
+      - "8081:8081"
+
+  msgr-user:
+    <<: *msgr-service
+    container_name: msgr-user
+    environment:
+      <<: *msgr-db-env
+      MSGR_SERVICE: user
+      SERVER_PORT: 8082
+    ports:
+      - "8082:8082"
+
+  msgr-chat:
+    <<: *msgr-service
+    container_name: msgr-chat
+    environment:
+      <<: *msgr-db-env
+      MSGR_SERVICE: chat
+      SERVER_PORT: 8083
+      SERVER_ADDRESS: 0.0.0.0
+    ports:
+      - "8083:8083"
+
+  msgr-file:
+    <<: *msgr-service
+    container_name: msgr-file
+    environment:
+      <<: *msgr-db-env
+      MSGR_SERVICE: file
+      SERVER_PORT: 8084
+      SERVER_ADDRESS: 0.0.0.0
+      FILE_UPLOAD_DIR: /app/uploads
+    ports:
+      - "8084:8084"
+    volumes:
+      - file_uploads:/app/uploads
+
+  msgr-gateway:
+    <<: *msgr-service
+    container_name: msgr-gateway
+    environment:
+      MSGR_SERVICE: gateway
+      SERVER_PORT: 8080
+      SPRING_CLOUD_GATEWAY_ROUTES_0_ID: auth-service
+      SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://msgr-auth:8081
+      SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0: Path=/api/auth/**
+      SPRING_CLOUD_GATEWAY_ROUTES_1_ID: user-service
+      SPRING_CLOUD_GATEWAY_ROUTES_1_URI: http://msgr-user:8082
+      SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0: Path=/api/users/**,/api/contacts/**
+      SPRING_CLOUD_GATEWAY_ROUTES_2_ID: chat-service
+      SPRING_CLOUD_GATEWAY_ROUTES_2_URI: http://msgr-chat:8083
+      SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0: Path=/api/chats/**
+      SPRING_CLOUD_GATEWAY_ROUTES_3_ID: file-service
+      SPRING_CLOUD_GATEWAY_ROUTES_3_URI: http://msgr-file:8084
+      SPRING_CLOUD_GATEWAY_ROUTES_3_PREDICATES_0: Path=/api/files/**
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      msgr-auth:
+        condition: service_started
+      msgr-user:
+        condition: service_started
+      msgr-chat:
+        condition: service_started
+      msgr-file:
+        condition: service_started
+
 volumes:
   postgres_data:
   redis_data:
+  file_uploads:
 
 networks:
   msgr-network:
